@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ファイルダウンローダー</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        
+        .file-list {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .file-item:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+        
+        .file-name {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1.1em;
+        }
+        
+        .download-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .download-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .add-file {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f1f3f4;
+            border-radius: 10px;
+        }
+        
+        #fileNameInput {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        #fileNameInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        #addFileBtn {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        
+        #addFileBtn:hover {
+            background: #38a169;
+        }
+        
+        .info {
+            background: #e6f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #0066cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📁 ファイルダウンローダー</h1>
+        
+        <div class="info">
+            <strong>使用方法:</strong> このHTMLファイルと同じディレクトリにあるファイルを追加して、ダウンロードリンクを作成できます。
+        </div>
+        
+        <div class="add-file">
+            <input type="text" id="fileNameInput" placeholder="ファイル名を入力（例: document.pdf）" />
+            <button id="addFileBtn" onclick="addFile()">追加</button>
+        </div>
+        
+        <div class="file-list" id="fileList">
+            <!-- デフォルトのサンプルファイル -->
+            <div class="file-item">
+                <span class="file-name">📄 sample.txt</span>
+                <a href="sample.txt" class="download-btn" download>ダウンロード</a>
+            </div>
+            <div class="file-item">
+                <span class="file-name">📊 data.csv</span>
+                <a href="data.csv" class="download-btn" download>ダウンロード</a>
+            </div>
+            <div class="file-item">
+                <span class="file-name">🖼️ image.jpg</span>
+                <a href="image.jpg" class="download-btn" download>ダウンロード</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ファイルタイプに応じたアイコンを取得
+        function getFileIcon(fileName) {
+            const extension = fileName.split('.').pop().toLowerCase();
+            const iconMap = {
+                'txt': '📄',
+                'pdf': '📕',
+                'doc': '📘',
+                'docx': '📘',
+                'xls': '📊',
+                'xlsx': '📊',
+                'csv': '📊',
+                'jpg': '🖼️',
+                'jpeg': '🖼️',
+                'png': '🖼️',
+                'gif': '🖼️',
+                'mp4': '🎬',
+                'avi': '🎬',
+                'mov': '🎬',
+                'mp3': '🎵',
+                'wav': '🎵',
+                'zip': '📦',
+                'rar': '📦',
+                'html': '🌐',
+                'css': '🎨',
+                'js': '⚡',
+                'json': '📋'
+            };
+            return iconMap[extension] || '📄';
+        }
+
+        // ファイルを追加する関数
+        function addFile() {
+            const input = document.getElementById('fileNameInput');
+            const fileName = input.value.trim();
+            
+            if (!fileName) {
+                alert('ファイル名を入力してください');
+                return;
+            }
+            
+            const fileList = document.getElementById('fileList');
+            const icon = getFileIcon(fileName);
+            
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+                <span class="file-name">${icon} ${fileName}</span>
+                <a href="${fileName}" class="download-btn" download>ダウンロード</a>
+            `;
+            
+            fileList.appendChild(fileItem);
+            input.value = '';
+        }
+
+        // Enterキーでファイル追加
+        document.getElementById('fileNameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addFile();
+            }
+        });
+    </script>
+</body>
+</html>
